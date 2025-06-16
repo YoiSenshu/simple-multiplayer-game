@@ -12,6 +12,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
 import pl.yoisenshu.smg.network.connection.ClientConnection;
@@ -38,6 +40,7 @@ public class SimpleMultiplayerGameServer {
 
     public static final int PORT = 2323;
 
+    private final Logger logger = LoggerFactory.getLogger(SimpleMultiplayerGameServer.class);
     private ServerBootstrap serverBootstrap;
     private Channel channel;
 
@@ -133,7 +136,7 @@ public class SimpleMultiplayerGameServer {
 
             ChannelFuture f = serverBootstrap.bind(PORT).sync();
             channel = f.channel();
-            System.out.println("[Server] Game server started on port " + PORT);
+            logger.info("Game server started on port " + PORT);
             f.channel().closeFuture().sync();
         } finally {
             boss.shutdownGracefully();

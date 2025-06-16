@@ -20,6 +20,6 @@ public final class ExceptionHandler extends SimpleChannelInboundHandler<Object> 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.err.println("[" + prefix + "] Exception caught: " + cause.getMessage());
-        cause.printStackTrace(System.out);
+        cause.printStackTrace(System.err);
     }
 }
