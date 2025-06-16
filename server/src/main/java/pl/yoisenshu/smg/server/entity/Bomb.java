@@ -1,6 +1,7 @@
 package pl.yoisenshu.smg.server.entity;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 import pl.yoisenshu.smg.entity.BombView;
@@ -9,6 +10,7 @@ import pl.yoisenshu.smg.server.SimpleMultiplayerGameServer;
 import pl.yoisenshu.smg.server.world.World;
 import pl.yoisenshu.smg.world.Position;
 
+@Slf4j
 public class Bomb extends BaseEntity implements BombView {
 
     private static final float EXPLOSION_RADIUS = 250.0f;
@@ -41,6 +43,7 @@ public class Bomb extends BaseEntity implements BombView {
 
     private void explode() {
         exploded = true;
+        log.debug("Bomb {} exploded at position {}", entityId, position);
 
         var packet = new ServerBombExplodedPacket(entityId);
 
@@ -58,6 +61,7 @@ public class Bomb extends BaseEntity implements BombView {
                     (int) (playerPosition.y() + y * knockbackPower)
                 );
 
+                log.debug("Player {} knocked back to position {}", player.getUsername(), newPosition);
                 player.move(newPosition);
                 player.sendPacket(packet);
             }
@@ -67,6 +71,6 @@ public class Bomb extends BaseEntity implements BombView {
 
     @Override
     public boolean isExploded() {
-        return false;
+        return exploded;
     }
 }

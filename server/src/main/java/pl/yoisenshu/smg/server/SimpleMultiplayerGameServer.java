@@ -10,10 +10,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
 import pl.yoisenshu.smg.network.connection.ClientConnection;
@@ -36,11 +35,11 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class SimpleMultiplayerGameServer {
 
     public static final int PORT = 2323;
 
-    private final Logger logger = LoggerFactory.getLogger(SimpleMultiplayerGameServer.class);
     private ServerBootstrap serverBootstrap;
     private Channel channel;
 
@@ -90,9 +89,9 @@ public class SimpleMultiplayerGameServer {
                         pip.addLast(new ExceptionHandler("Server"));
 
                         pip.addLast(new LoginHandler((ctx, packet) -> {
-                            System.out.println("[Server] New connection from " + ctx.channel().remoteAddress() + " with username: " + packet.getUsername());
+
                             if(players.containsKey(ctx.channel())) {
-                                System.out.println("[Server] CLOSING CONNECTION!");
+                                log.warn("Incorrect login attempt from {}. Player already logged in.", ctx.channel().remoteAddress());
                                 ctx.close();
                                 return;
                             }
@@ -110,8 +109,7 @@ public class SimpleMultiplayerGameServer {
 
                             world.addPlayer(player);
 
-                            System.out.println("[Server] Player " + player.getUsername() + " logged in with entity ID: " + player.getId());
-
+                            log.info("Player {} logged in with entity ID: {}", player.getUsername(), player.getId());
                             broadcastMessage("Player " + player.getUsername() + " has joined the game!");
 
                             players.forEach((c, p) -> {
@@ -136,7 +134,7 @@ public class SimpleMultiplayerGameServer {
 
             ChannelFuture f = serverBootstrap.bind(PORT).sync();
             channel = f.channel();
-            logger.info("Game server started on port " + PORT);
+            log.info("Game server started on port " + PORT);
             f.channel().closeFuture().sync();
         } finally {
             boss.shutdownGracefully();
@@ -171,12 +169,12 @@ public class SimpleMultiplayerGameServer {
     }
 
     public void shutdown() {
-        System.out.println("[Server] Shutting down the server...");
+        log.info("Shutting down the server...");
         channel.close();
     }
 
     public void broadcastMessage(@NotNull String message) {
-        System.out.println("[Server] [Broadcast] " + message);
+        log.info("[Broadcast] {}", message);
         players.forEach((c, p) -> p.sendPacket(new ServerChatMessagePacket(message)));
     }
 
@@ -187,6 +185,9 @@ public class SimpleMultiplayerGameServer {
 
     @NotNull
     public Set<Player> getOnlinePlayers() {
-        return players.values().stream().filter(Player::isOnline).collect(Collectors.toUnmodifiableSet());
+        return players.values()
+            .stream()
+            .filter(Player::isOnline)
+            .collect(Collectors.toUnmodifiableSet());
     }
 }

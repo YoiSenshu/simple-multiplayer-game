@@ -2,6 +2,7 @@ package pl.yoisenshu.smg.server.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.connection.ClientConnection;
 import pl.yoisenshu.smg.network.packet.server.ClientboundPacket;
@@ -12,6 +13,7 @@ import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.server.world.World;
 import pl.yoisenshu.smg.world.Position;
 
+@Slf4j
 public class Player extends BaseEntity implements PlayerView {
 
     @Getter
@@ -34,6 +36,7 @@ public class Player extends BaseEntity implements PlayerView {
         this.connection = connection;
         this.username = username;
         this.skinColor = skinColor;
+        log.debug("Player created: {} (ID: {})", username, getId());
     }
 
     public void sendPacket(@NotNull ClientboundPacket packet) {
@@ -42,6 +45,7 @@ public class Player extends BaseEntity implements PlayerView {
 
     @Override
     public void remove() {
+        log.debug("Removing player: {} (ID: {})", username, getId());
         if(connection.isActive()) {
             connection.close();
         }
@@ -74,7 +78,7 @@ public class Player extends BaseEntity implements PlayerView {
     }
 
     public void disconnect(@NotNull String reason) {
-        System.out.println("[Server] Player " + username + " disconnected: " + reason);
+        log.info("Player {} (ID: {}) disconnected: {}", username, getId(), reason);
         if(connection.isActive()) {
             sendPacket(new ServerDisconnectPacket(reason));
             connection.close();
@@ -83,10 +87,12 @@ public class Player extends BaseEntity implements PlayerView {
     }
 
     public void sendServerMessage(@NotNull String message) {
+        log.info("Server message to {} (ID: {}): {}", username, getId(), message);
         sendPacket(new ServerChatMessagePacket(message));
     }
 
     public void sendPlayerMessage(@NotNull PlayerView sender, @NotNull String message) {
+        log.info("Message from {} (ID: {}) to {} (ID: {}): {}", sender.getUsername(), sender.getId(), username, getId(), message);
         sendPacket(new ServerChatMessagePacket(sender.getId(), message));
     }
 
