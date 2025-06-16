@@ -21,7 +21,6 @@ import pl.yoisenshu.smg.client.world.RemoteWorld;
 import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
 import pl.yoisenshu.smg.network.packet.util.ExceptionHandler;
-import pl.yoisenshu.smg.server.SimpleMultiplayerGameServer;
 import pl.yoisenshu.smg.client.connection.ServerConnection;
 import pl.yoisenshu.smg.client.connection.ConnectionManager;
 
@@ -58,19 +57,7 @@ public class SimpleMultiplayerGameClient extends ApplicationAdapter {
 
         currentGameState = new MenuGameState(this);
         currentGameState.init();
-
-        // TODO remove
-        /*CompletableFuture.runAsync(() -> {
-            try {
-                this.server = new SimpleMultiplayerGameServer();
-                server.start();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });*/
     }
-
-    public SimpleMultiplayerGameServer server; // TODO remove
 
     @Override
     public void render() {
@@ -92,7 +79,6 @@ public class SimpleMultiplayerGameClient extends ApplicationAdapter {
         currentGameState.dispose();
         assetManager.dispose();
         connectionManager.shutdown();
-        server.shutdown(); // TODO remove
     }
 
     public void changeGameState(@NotNull GameState newState) {

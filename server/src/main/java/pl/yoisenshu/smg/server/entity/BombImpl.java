@@ -1,13 +1,13 @@
-package pl.yoisenshu.smg.entity;
+package pl.yoisenshu.smg.server.entity;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import pl.yoisenshu.smg.entity.BaseEntity;
 import pl.yoisenshu.smg.network.packet.server.ServerBombExplodedPacket;
-import pl.yoisenshu.smg.player.PlayerHandle;
 import pl.yoisenshu.smg.server.SimpleMultiplayerGameServer;
 import pl.yoisenshu.smg.world.Position;
 
-public class Bomb extends BaseEntity {
+public class BombImpl extends BaseEntity {
 
     private static final float EXPLOSION_RADIUS = 250.0f;
     private static final float EXPLOSION_KNOCKBACK = 150.0f;
@@ -16,7 +16,7 @@ public class Bomb extends BaseEntity {
     @Getter
     private int ticksToExplode;
 
-    public Bomb(
+    public BombImpl(
         int id,
         @NotNull Position position,
         int ticksToExplode,

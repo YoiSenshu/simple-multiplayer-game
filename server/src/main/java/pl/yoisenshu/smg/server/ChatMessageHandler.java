@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.client.ClientChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
-import pl.yoisenshu.smg.player.PlayerHandle;
+import pl.yoisenshu.smg.server.entity.PlayerHandle;
 
 @AllArgsConstructor
 class ChatMessageHandler extends SimpleChannelInboundHandler<ClientChatMessagePacket> {

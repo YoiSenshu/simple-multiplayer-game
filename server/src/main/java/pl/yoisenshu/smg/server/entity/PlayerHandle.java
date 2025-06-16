@@ -1,4 +1,4 @@
-package pl.yoisenshu.smg.player;
+package pl.yoisenshu.smg.server.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +10,7 @@ import pl.yoisenshu.smg.network.packet.server.ClientboundPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.server.ServerDisconnectPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerMovePacket;
+import pl.yoisenshu.smg.player.Player;
 import pl.yoisenshu.smg.world.Position;
 
 public class PlayerHandle extends BaseEntity implements Player {

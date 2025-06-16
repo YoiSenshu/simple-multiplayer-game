@@ -4,11 +4,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import pl.yoisenshu.smg.network.packet.client.ClientChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.client.ClientMovePacket;
-import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerMovePacket;
-import pl.yoisenshu.smg.player.PlayerHandle;
+import pl.yoisenshu.smg.server.entity.PlayerHandle;
 
 @AllArgsConstructor
 class PlayerMoveHandler extends SimpleChannelInboundHandler<ClientMovePacket> {

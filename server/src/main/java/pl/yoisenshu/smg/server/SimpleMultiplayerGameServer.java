@@ -12,16 +12,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.entity.BaseEntity;
-import pl.yoisenshu.smg.network.connection.ClientConnection;
 import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
+import pl.yoisenshu.smg.network.connection.ClientConnection;
 import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.server.ServerEntityRemovedPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerLoginSuccessPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerJoinedPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerWorldDataPacket;
 import pl.yoisenshu.smg.network.packet.util.ExceptionHandler;
-import pl.yoisenshu.smg.player.PlayerHandle;
+import pl.yoisenshu.smg.server.entity.PlayerHandle;
 import pl.yoisenshu.smg.world.Position;
 
 import java.time.Instant;

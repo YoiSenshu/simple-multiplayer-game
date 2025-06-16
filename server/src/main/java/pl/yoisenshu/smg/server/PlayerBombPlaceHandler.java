@@ -4,10 +4,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import pl.yoisenshu.smg.entity.Bomb;
+import pl.yoisenshu.smg.server.entity.BombImpl;
 import pl.yoisenshu.smg.network.packet.client.ClientPlaceBombPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerBombPlacedPacket;
-import pl.yoisenshu.smg.player.PlayerHandle;
+import pl.yoisenshu.smg.server.entity.PlayerHandle;
 
 @AllArgsConstructor
 class PlayerBombPlaceHandler extends SimpleChannelInboundHandler<ClientPlaceBombPacket> {
@@ -28,7 +28,7 @@ class PlayerBombPlaceHandler extends SimpleChannelInboundHandler<ClientPlaceBomb
         player.setBombPlaceCooldown(20);
         int bombId = server.getNewEntityId();
 
-        var bomb = new Bomb(
+        var bomb = new BombImpl(
             bombId,
             packet.getPosition(),
             60,

@@ -1,9 +1,5 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     //api "com.github.tommyettinger:digital:$digitalVersion"
@@ -14,6 +10,7 @@ dependencies {
     //api "com.squidpony:squidcore:$squidCoreVersion"
     //api "com.squidpony:squidpress:$squidPressVersion"
     implementation project(":core")
+    implementation project(":network")
 
     if(enableGraalNative == 'true') {
       implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
@@ -21,5 +18,4 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
-    compileOnly("org.jetbrains:annotations:26.0.2")
 }

@@ -1,13 +1,5 @@
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    api "io.netty:netty-buffer:$nettyVersion"
-    api "io.netty:netty-transport:$nettyVersion"
-    api "io.netty:netty-codec:$nettyVersion"
-
+    api "org.jetbrains:annotations:26.0.2"
     compileOnly "org.projectlombok:lombok:1.18.38"
     annotationProcessor "org.projectlombok:lombok:1.18.38"
-    compileOnly "org.jetbrains:annotations:26.0.2"
 }
