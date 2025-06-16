@@ -3,7 +3,6 @@ package pl.yoisenshu.smg.server.entity;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import pl.yoisenshu.smg.network.connection.ClientConnection;
 import pl.yoisenshu.smg.network.packet.server.ClientboundPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
@@ -74,10 +73,12 @@ public class Player extends BaseEntity implements PlayerView {
         return connection.isActive();
     }
 
-    public void disconnect(@Nullable String reason) {
-        sendPacket(new ServerDisconnectPacket(reason));
+    public void disconnect(@NotNull String reason) {
         System.out.println("[Server] Player " + username + " disconnected: " + reason);
-        connection.close();
+        if(connection.isActive()) {
+            sendPacket(new ServerDisconnectPacket(reason));
+            connection.close();
+        }
         remove();
     }
 
