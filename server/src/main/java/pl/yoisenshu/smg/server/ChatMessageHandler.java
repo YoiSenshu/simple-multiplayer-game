@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.client.ClientChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
-import pl.yoisenshu.smg.server.entity.PlayerHandle;
+import pl.yoisenshu.smg.server.entity.Player;
 
 @AllArgsConstructor
 class ChatMessageHandler extends SimpleChannelInboundHandler<ClientChatMessagePacket> {
@@ -15,7 +15,7 @@ class ChatMessageHandler extends SimpleChannelInboundHandler<ClientChatMessagePa
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull ClientChatMessagePacket packet) {
-        PlayerHandle player = server.players.get(ctx.channel());
+        Player player = server.players.get(ctx.channel());
         if(player == null) {
             return;
         }

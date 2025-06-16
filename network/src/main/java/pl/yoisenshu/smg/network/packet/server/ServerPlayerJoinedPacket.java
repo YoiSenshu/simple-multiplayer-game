@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.PacketType;
 import pl.yoisenshu.smg.network.packet.util.PacketUtil;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
 
 @Getter
@@ -18,7 +18,7 @@ public class ServerPlayerJoinedPacket implements ClientboundPacket {
     private int entityId;
     private Position position;
     private String username;
-    private Player.SkinColor skinColor;
+    private PlayerView.SkinColor skinColor;
 
     @Override
     public void encode(@NotNull ByteBuf out) {
@@ -36,7 +36,7 @@ public class ServerPlayerJoinedPacket implements ClientboundPacket {
         int y = in.readInt();
         position = new Position(x, y);
         username = PacketUtil.readString(in);
-        skinColor = Player.SkinColor.values()[in.readInt()];
+        skinColor = PlayerView.SkinColor.values()[in.readInt()];
     }
 
     @Override

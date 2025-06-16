@@ -4,8 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.AllArgsConstructor;
 import pl.yoisenshu.smg.client.SimpleMultiplayerGameClient;
-import pl.yoisenshu.smg.client.entity.RemoteBomb;
-import pl.yoisenshu.smg.client.world.RemoteWorld;
+import pl.yoisenshu.smg.client.entity.ClientBomb;
+import pl.yoisenshu.smg.client.world.ClientWorld;
 import pl.yoisenshu.smg.network.packet.server.ServerBombExplodedPacket;
 
 @AllArgsConstructor
@@ -15,10 +15,10 @@ public class BombExplodedHandler extends SimpleChannelInboundHandler<ServerBombE
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ServerBombExplodedPacket packet) {
-        RemoteWorld world = client.getCurrentWorld();
+        ClientWorld world = client.getCurrentWorld();
         if(world != null) {
             var entity = world.getEntities().get(packet.getEntityId());
-            if(entity instanceof RemoteBomb remoteBomb) {
+            if(entity instanceof ClientBomb remoteBomb) {
                 remoteBomb.showExplosion();
             }
         }

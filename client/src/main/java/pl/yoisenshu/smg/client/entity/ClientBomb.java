@@ -7,12 +7,12 @@ import pl.yoisenshu.smg.world.Position;
 import java.time.Instant;
 
 @Getter
-public class RemoteBomb extends RemoteEntity {
+public class ClientBomb extends ClientEntity {
 
     private final Instant explosionTime;
     private boolean exploding = false;
 
-    public RemoteBomb(int id, @NotNull Position position, int countdownMillis) {
+    public ClientBomb(int id, @NotNull Position position, int countdownMillis) {
         super(id, position);
         this.explosionTime = Instant.now().plusMillis(countdownMillis);
     }

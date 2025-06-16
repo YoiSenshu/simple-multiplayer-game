@@ -11,7 +11,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import pl.yoisenshu.smg.entity.BaseEntity;
+import pl.yoisenshu.smg.server.entity.BaseEntity;
 import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
 import pl.yoisenshu.smg.network.connection.ClientConnection;
@@ -21,7 +21,7 @@ import pl.yoisenshu.smg.network.packet.server.ServerLoginSuccessPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerJoinedPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerWorldDataPacket;
 import pl.yoisenshu.smg.network.packet.util.ExceptionHandler;
-import pl.yoisenshu.smg.server.entity.PlayerHandle;
+import pl.yoisenshu.smg.server.entity.Player;
 import pl.yoisenshu.smg.world.Position;
 
 import java.time.Instant;
@@ -42,7 +42,7 @@ public class SimpleMultiplayerGameServer {
     private final String worldName = "World " + Instant.now().getNano();
     @Getter private int tick = 0;
     @Getter final Map<Integer, BaseEntity> entities = new ConcurrentHashMap<>();
-    @Getter final Map<Channel, PlayerHandle> players = new ConcurrentHashMap<>();
+    @Getter final Map<Channel, Player> players = new ConcurrentHashMap<>();
 
     public SimpleMultiplayerGameServer() throws InterruptedException {}
 
@@ -52,7 +52,6 @@ public class SimpleMultiplayerGameServer {
         tickTask.schedule(new TimerTask() {
             @Override
             public void run() {
-                tick++;
                 onTick();
             }
         }, 5000, 40); // ~ 13 milisekund opóźnienia było przy 50ms
@@ -79,7 +78,7 @@ public class SimpleMultiplayerGameServer {
                                 ctx.close();
                                 return;
                             }
-                            var player = new PlayerHandle(
+                            var player = new Player(
                                 getNewEntityId(),
                                 new Position(100, 100),
                                 new ClientConnection(ctx.channel()),
@@ -131,13 +130,14 @@ public class SimpleMultiplayerGameServer {
     }
 
     private void onTick() {
+        tick++;
         for (BaseEntity entity : entities.values()) {
             if(entity.isRemoved()) {
                 entities.remove(entity.getId());
                 players.forEach((c, p) -> p.sendPacket(new ServerEntityRemovedPacket(entity.getId())));
                 continue;
             }
-            entity.tick();
+            entity.tick(tick);
         }
     }
 
@@ -150,7 +150,7 @@ public class SimpleMultiplayerGameServer {
 
     private ServerWorldDataPacket createWorldDataPacket() {
         Set<ServerWorldDataPacket.PlayerData> playerData = new HashSet<>();
-        for (PlayerHandle handle : players.values()) {
+        for (Player handle : players.values()) {
             playerData.add(new ServerWorldDataPacket.PlayerData(
                 handle.getId(),
                 handle.getUsername(),

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.PacketType;
 import pl.yoisenshu.smg.network.packet.util.PacketUtil;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.player.PlayerView;
 
 @Getter
 @NoArgsConstructor
@@ -15,7 +15,7 @@ import pl.yoisenshu.smg.player.Player;
 public class ClientLoginPacket implements ServerboundPacket {
 
     private String username;
-    private Player.SkinColor skinColor;
+    private PlayerView.SkinColor skinColor;
 
     @NotNull
     @Override
@@ -32,6 +32,6 @@ public class ClientLoginPacket implements ServerboundPacket {
     @Override
     public void decode(@NotNull ByteBuf in) {
         this.username = PacketUtil.readString(in);
-        this.skinColor = Player.SkinColor.values()[in.readInt()];
+        this.skinColor = PlayerView.SkinColor.values()[in.readInt()];
     }
 }

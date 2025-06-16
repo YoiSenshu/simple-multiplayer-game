@@ -4,37 +4,37 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.client.SimpleMultiplayerGameClient;
 import pl.yoisenshu.smg.client.connection.ServerConnection;
-import pl.yoisenshu.smg.client.entity.RemoteEntity;
-import pl.yoisenshu.smg.client.player.ClientPlayer;
+import pl.yoisenshu.smg.client.entity.ClientEntity;
+import pl.yoisenshu.smg.client.player.ControllablePlayer;
 import pl.yoisenshu.smg.client.player.ClientPlayerData;
-import pl.yoisenshu.smg.client.player.RemotePlayer;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.client.player.ClientPlayer;
+import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
-import pl.yoisenshu.smg.world.World;
+import pl.yoisenshu.smg.world.WorldView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RemoteWorld implements World {
+public class ClientWorld implements WorldView {
 
-    private ServerConnection connection;
-    private String name;
-    @Getter private final ClientPlayer clientPlayer;
-    @Getter private final Map<Integer, RemoteEntity> entities = new HashMap<>();
-    @Getter private final Map<Integer, RemotePlayer> players = new HashMap<>();
+    private final ServerConnection connection;
+    private final String worldName;
+    @Getter private final ControllablePlayer clientPlayer;
+    @Getter private final Map<Integer, ClientEntity> entities = new HashMap<>();
+    @Getter private final Map<Integer, ClientPlayer> players = new HashMap<>();
     @Getter List<String> chatHistory = new ArrayList<>();
 
-    public RemoteWorld(
+    public ClientWorld(
         @NotNull SimpleMultiplayerGameClient client,
         @NotNull ServerConnection connection,
         @NotNull RemoteWorldData initialWorldData,
         @NotNull ClientPlayerData playerData
     ) {
         this.connection = connection;
-        this.name = initialWorldData.worldName();
-        this.clientPlayer = new ClientPlayer(
+        this.worldName = initialWorldData.worldName();
+        this.clientPlayer = new ControllablePlayer(
             client,
             connection,
             playerData
@@ -46,7 +46,7 @@ public class RemoteWorld implements World {
                 players.put(player.entityId(), clientPlayer);
                 continue;
             }
-            players.put(player.entityId(), new RemotePlayer(
+            players.put(player.entityId(), new ClientPlayer(
                 player.entityId(),
                 player.username(),
                 player.position(),
@@ -55,15 +55,10 @@ public class RemoteWorld implements World {
         }
     }
 
-    @Override
-    public @NotNull String getName() {
-        return name;
-    }
-
     public void updatePlayerPosition(int entityId, @NotNull Position position) {
-        RemotePlayer player = players.get(entityId);
+        ClientPlayer player = players.get(entityId);
         if (player != null) {
-            player.move(position);
+            player.onMove(position);
         }
     }
 
@@ -75,16 +70,16 @@ public class RemoteWorld implements World {
         int entityId,
         @NotNull String username,
         @NotNull Position position,
-        @NotNull Player.SkinColor skinColor
+        @NotNull PlayerView.SkinColor skinColor
     ) {
-        RemotePlayer remotePlayer = new RemotePlayer(
+        ClientPlayer clientPlayer = new ClientPlayer(
             entityId,
             username,
             position,
             skinColor
         );
-        entities.put(entityId, remotePlayer);
-        players.put(entityId, remotePlayer);
+        entities.put(entityId, clientPlayer);
+        players.put(entityId, clientPlayer);
     }
 
     public void removePlayer(int entityId) {
@@ -92,11 +87,16 @@ public class RemoteWorld implements World {
         players.remove(entityId);
     }
 
-    public void addEntity(RemoteEntity entity) {
+    public void addEntity(ClientEntity entity) {
         entities.put(entity.getId(), entity);
     }
 
     public void removeEntity(int entityId) {
         entities.remove(entityId);
+    }
+
+    @Override
+    public @NotNull String getName() {
+        return worldName;
     }
 }

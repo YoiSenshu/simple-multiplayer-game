@@ -4,16 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import pl.yoisenshu.smg.entity.BaseEntity;
 import pl.yoisenshu.smg.network.connection.ClientConnection;
 import pl.yoisenshu.smg.network.packet.server.ClientboundPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.server.ServerDisconnectPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerMovePacket;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
 
-public class PlayerHandle extends BaseEntity implements Player {
+public class Player extends BaseEntity implements PlayerView {
 
     private final ClientConnection connection;
     private final String username;
@@ -23,7 +22,7 @@ public class PlayerHandle extends BaseEntity implements Player {
     @Setter
     private int bombPlaceCooldown = 0;
 
-    public PlayerHandle(
+    public Player(
         int entityId,
         @NotNull Position position,
         @NotNull ClientConnection connection,
@@ -63,7 +62,7 @@ public class PlayerHandle extends BaseEntity implements Player {
         sendPacket(new ServerChatMessagePacket(message));
     }
 
-    public void sendPlayerMessage(@NotNull Player sender, @NotNull String message) {
+    public void sendPlayerMessage(@NotNull PlayerView sender, @NotNull String message) {
         sendPacket(new ServerChatMessagePacket(sender.getId(), message));
     }
 

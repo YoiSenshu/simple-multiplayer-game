@@ -17,7 +17,7 @@ import pl.yoisenshu.smg.client.handler.PlayerJoinHandler;
 import pl.yoisenshu.smg.client.handler.PlayerMoveHandler;
 import pl.yoisenshu.smg.client.handler.PlayerLeftHandler;
 import pl.yoisenshu.smg.client.handler.WorldDataHandler;
-import pl.yoisenshu.smg.client.world.RemoteWorld;
+import pl.yoisenshu.smg.client.world.ClientWorld;
 import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
 import pl.yoisenshu.smg.network.packet.util.ExceptionHandler;
@@ -86,7 +86,7 @@ public class SimpleMultiplayerGameClient extends ApplicationAdapter {
     }
 
     @Nullable
-    public RemoteWorld getCurrentWorld() {
+    public ClientWorld getCurrentWorld() {
         if (currentGameState instanceof PlayingGameState playingGameState) {
             return playingGameState.getRemoteWorld();
         }

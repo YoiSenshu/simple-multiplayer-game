@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,16 +15,15 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import pl.yoisenshu.smg.client.player.ClientPlayer;
+import pl.yoisenshu.smg.client.player.ControllablePlayer;
 import pl.yoisenshu.smg.client.player.ClientPlayerData;
-import pl.yoisenshu.smg.client.world.RemoteWorld;
+import pl.yoisenshu.smg.client.world.ClientWorld;
 import pl.yoisenshu.smg.client.world.RemoteWorldData;
 import pl.yoisenshu.smg.client.world.WorldRenderer;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 class PlayingGameState extends GameState {
 
@@ -50,7 +48,7 @@ class PlayingGameState extends GameState {
     private final RemoteWorldData initialWorldData;
     private final ClientPlayerData initialPlayerData;
 
-    @Getter private RemoteWorld remoteWorld;
+    @Getter private ClientWorld remoteWorld;
 
     PlayingGameState(
         @NotNull SimpleMultiplayerGameClient client,
@@ -82,7 +80,7 @@ class PlayingGameState extends GameState {
         initUI();
         Gdx.input.setInputProcessor(stage);
 
-        remoteWorld = new RemoteWorld(
+        remoteWorld = new ClientWorld(
             client,
             client.getConnection(),
             initialWorldData,
@@ -91,10 +89,10 @@ class PlayingGameState extends GameState {
         worldRenderer = new WorldRenderer(
             client.getAssetManager().get("texture/grass.png", Texture.class),
             Map.of(
-                Player.SkinColor.RED, client.getAssetManager().get("texture/player_red.png", Texture.class),
-                Player.SkinColor.ORANGE, client.getAssetManager().get("texture/player_orange.png", Texture.class),
-                Player.SkinColor.YELLOW, client.getAssetManager().get("texture/player_yellow.png", Texture.class),
-                Player.SkinColor.GREEN, client.getAssetManager().get("texture/player_green.png", Texture.class)
+                PlayerView.SkinColor.RED, client.getAssetManager().get("texture/player_red.png", Texture.class),
+                PlayerView.SkinColor.ORANGE, client.getAssetManager().get("texture/player_orange.png", Texture.class),
+                PlayerView.SkinColor.YELLOW, client.getAssetManager().get("texture/player_yellow.png", Texture.class),
+                PlayerView.SkinColor.GREEN, client.getAssetManager().get("texture/player_green.png", Texture.class)
             ),
             skin.getFont("font"),
             client.getAssetManager().get("texture/bomb.png", Texture.class)
@@ -213,7 +211,7 @@ class PlayingGameState extends GameState {
 
         chatHistoryLabel.setText(String.join("\n", remoteWorld.getChatHistory()));
 
-        ClientPlayer player = remoteWorld.getClientPlayer();
+        ControllablePlayer player = remoteWorld.getClientPlayer();
         Position position = player.getPosition();
 
         // movement

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.client.ClientDisconnectPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerLeftPacket;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.player.PlayerView;
 
 @AllArgsConstructor
 class DisconnectHandler extends SimpleChannelInboundHandler<ClientDisconnectPacket> {
@@ -19,7 +19,7 @@ class DisconnectHandler extends SimpleChannelInboundHandler<ClientDisconnectPack
         if(!server.players.containsKey(channel)) {
             return;
         }
-        Player player = server.players.get(channel);
+        PlayerView player = server.players.get(channel);
         server.players.remove(channel);
         server.entities.remove(player.getId());
         server.players.forEach((c, p) -> p.sendPacket(new ServerPlayerLeftPacket(player.getId())));

@@ -4,8 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.AllArgsConstructor;
 import pl.yoisenshu.smg.client.SimpleMultiplayerGameClient;
-import pl.yoisenshu.smg.client.entity.RemoteBomb;
-import pl.yoisenshu.smg.client.world.RemoteWorld;
+import pl.yoisenshu.smg.client.entity.ClientBomb;
+import pl.yoisenshu.smg.client.world.ClientWorld;
 import pl.yoisenshu.smg.network.packet.server.ServerBombPlacedPacket;
 
 @AllArgsConstructor
@@ -15,9 +15,9 @@ public class BombPlacedHandler extends SimpleChannelInboundHandler<ServerBombPla
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ServerBombPlacedPacket packet) {
-        RemoteWorld world = client.getCurrentWorld();
+        ClientWorld world = client.getCurrentWorld();
         if(world != null) {
-            world.addEntity(new RemoteBomb(
+            world.addEntity(new ClientBomb(
                 packet.getEntityId(),
                 packet.getPosition(),
                 packet.getMillisToExplode()

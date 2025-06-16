@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.PacketType;
 import pl.yoisenshu.smg.network.packet.util.PacketUtil;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
 
 import java.util.HashSet;
@@ -54,7 +54,7 @@ public class ServerWorldDataPacket implements ClientboundPacket {
             String playerName = new String(playerNameBytes);
             int x = in.readInt();
             int y = in.readInt();
-            Player.SkinColor skinColor = Player.SkinColor.values()[in.readInt()];
+            PlayerView.SkinColor skinColor = PlayerView.SkinColor.values()[in.readInt()];
             Position position = new Position(x, y);
             this.players.add(new PlayerData(entityId, playerName, position, skinColor));
         }
@@ -69,6 +69,6 @@ public class ServerWorldDataPacket implements ClientboundPacket {
         int entityId,
         @NotNull String username,
         @NotNull Position position,
-        @NotNull Player.SkinColor skinColor
+        @NotNull PlayerView.SkinColor skinColor
     ) {}
 }

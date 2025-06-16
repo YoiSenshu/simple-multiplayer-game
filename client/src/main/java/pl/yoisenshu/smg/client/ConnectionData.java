@@ -2,7 +2,7 @@ package pl.yoisenshu.smg.client;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
-import pl.yoisenshu.smg.player.Player;
+import pl.yoisenshu.smg.player.PlayerView;
 
 import java.util.Optional;
 import java.util.Random;
@@ -11,7 +11,7 @@ record ConnectionData (
     @NotNull String username,
     @NotNull String host,
     @Range(from = 0, to = 10_000) int port,
-    @NotNull Player.SkinColor skinColor
+    @NotNull PlayerView.SkinColor skinColor
 ) {
 
     private static final String USERNAME_REGEX = "^[a-zA-Z0-9_]{1,16}$";
@@ -40,7 +40,7 @@ record ConnectionData (
         }
 
         Random random = new Random();
-        Player.SkinColor skinColor = Player.SkinColor.values()[random.nextInt(Player.SkinColor.values().length)];
+        PlayerView.SkinColor skinColor = PlayerView.SkinColor.values()[random.nextInt(PlayerView.SkinColor.values().length)];
 
         return Optional.of(new ConnectionData(username, host, port, skinColor));
     }

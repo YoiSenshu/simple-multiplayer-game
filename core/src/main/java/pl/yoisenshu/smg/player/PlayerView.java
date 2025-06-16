@@ -2,13 +2,14 @@ package pl.yoisenshu.smg.player;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import pl.yoisenshu.smg.entity.Entity;
+import pl.yoisenshu.smg.entity.EntityView;
 
-public interface Player extends Entity {
+public interface PlayerView extends EntityView {
 
     @NotNull String getUsername();
 
     @NotNull SkinColor getSkinColor();
+
 
     @Getter
     enum SkinColor {

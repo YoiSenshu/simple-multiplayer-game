@@ -2,45 +2,46 @@ package pl.yoisenshu.smg.server.entity;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import pl.yoisenshu.smg.entity.BaseEntity;
+import org.jetbrains.annotations.Range;
+import pl.yoisenshu.smg.entity.BombView;
 import pl.yoisenshu.smg.network.packet.server.ServerBombExplodedPacket;
 import pl.yoisenshu.smg.server.SimpleMultiplayerGameServer;
 import pl.yoisenshu.smg.world.Position;
 
-public class BombImpl extends BaseEntity {
+public class Bomb extends BaseEntity implements BombView {
 
     private static final float EXPLOSION_RADIUS = 250.0f;
     private static final float EXPLOSION_KNOCKBACK = 150.0f;
 
     private final SimpleMultiplayerGameServer server;
-    @Getter
-    private int ticksToExplode;
+    @Getter private int fuseTime;
+    private boolean exploded;
 
-    public BombImpl(
+    public Bomb(
         int id,
         @NotNull Position position,
-        int ticksToExplode,
+        @Range(from = 0, to = Integer.MAX_VALUE) int fuseTime,
         @NotNull SimpleMultiplayerGameServer server
     ) {
         super(id, position);
-        this.ticksToExplode = ticksToExplode;
+        this.fuseTime = fuseTime;
         this.server = server;
     }
 
     @Override
     public void tick() {
-
-        if(ticksToExplode > 0) {
-            ticksToExplode--;
-            if (ticksToExplode <= 0) {
+        if(!exploded) {
+            fuseTime--;
+            if(fuseTime <= 0) {
                 explode();
             }
         }
     }
 
     private void explode() {
-        for (PlayerHandle player : server.getPlayers().values()) {
-            player.sendPacket(new ServerBombExplodedPacket(id));
+        exploded = true;
+        for (Player player : server.getPlayers().values()) {
+            player.sendPacket(new ServerBombExplodedPacket(entityId));
             Position playerPosition = player.getPosition();
             float distance = position.distanceTo(playerPosition);
             if(distance <= EXPLOSION_RADIUS && distance > 0) {
@@ -57,5 +58,10 @@ public class BombImpl extends BaseEntity {
             }
         }
         this.remove();
+    }
+
+    @Override
+    public boolean isExploded() {
+        return false;
     }
 }
