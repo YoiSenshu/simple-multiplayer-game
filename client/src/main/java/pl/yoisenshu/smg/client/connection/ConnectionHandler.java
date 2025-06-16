@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
+@Deprecated
 public class ConnectionHandler extends SimpleChannelInboundHandler<Object> {
 
     private final CompletableFuture<ServerConnection> connectionFuture;

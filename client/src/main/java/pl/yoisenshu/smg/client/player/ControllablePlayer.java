@@ -45,11 +45,20 @@ public class ControllablePlayer extends ClientPlayer {
         connection.sendPacket(packet);
     }
 
+    private void sendPacketSync(@NotNull ServerboundPacket packet) throws InterruptedException {
+        connection.sendPacketSync(packet);
+    }
+
     public void disconnect(@Nullable String reason) {
-        sendPacket(new ClientDisconnectPacket(reason));
-        if(connection.isActive()) {
-            connection.close();
-            client.setConnection(null);
+        try {
+            sendPacketSync(new ClientDisconnectPacket(reason));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(connection.isActive()) {
+                connection.close();
+                client.setConnection(null);
+            }
         }
     }
 

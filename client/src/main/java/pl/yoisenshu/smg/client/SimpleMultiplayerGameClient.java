@@ -22,23 +22,24 @@ import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
 import pl.yoisenshu.smg.network.packet.util.ExceptionHandler;
 import pl.yoisenshu.smg.client.connection.ServerConnection;
-import pl.yoisenshu.smg.client.connection.ConnectionManager;
+import pl.yoisenshu.smg.client.connection.LegacyConnectionManager;
 
 public class SimpleMultiplayerGameClient extends ApplicationAdapter {
 
     // game states
-    @Getter private GameState currentGameState;
+    @Getter
+    private GameState currentGameState;
     private GameState nextGameState;
 
     @Getter private AssetManager assetManager;
-    @Getter private ConnectionManager connectionManager;
+    @Getter private LegacyConnectionManager legacyConnectionManager;
     @Getter @Setter private ServerConnection connection;
 
     @Override
     public void create() {
         assetManager = new AssetManager();
 
-        connectionManager = new ConnectionManager(channel -> {
+        legacyConnectionManager = new LegacyConnectionManager(channel -> {
             var pip = channel.pipeline();
             pip.addLast(new PacketDecoder(PacketDecoder.PacketBound.CLIENTBOUND));
             pip.addLast(new PacketEncoder());
@@ -75,10 +76,33 @@ public class SimpleMultiplayerGameClient extends ApplicationAdapter {
     }
 
     @Override
+    public void resize (int width, int height) {
+        if(currentGameState != null) {
+            currentGameState.resize(width, height);
+        }
+    }
+
+    @Override
+    public void pause () {
+        if(currentGameState != null) {
+            currentGameState.pause();
+        }
+    }
+
+    @Override
+    public void resume () {
+        if(currentGameState != null) {
+            currentGameState.resume();
+        }
+    }
+
+    @Override
     public void dispose() {
-        currentGameState.dispose();
+        if(currentGameState != null) {
+            currentGameState.dispose();
+        }
         assetManager.dispose();
-        connectionManager.shutdown();
+        legacyConnectionManager.shutdown();
     }
 
     public void changeGameState(@NotNull GameState newState) {

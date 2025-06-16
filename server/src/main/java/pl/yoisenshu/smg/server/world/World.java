@@ -1,6 +1,5 @@
 package pl.yoisenshu.smg.server.world;
 
-import io.netty.util.collection.IntObjectHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import pl.yoisenshu.smg.world.WorldView;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,7 +25,7 @@ public class World implements WorldView, Tickable {
     @Getter
     @Setter
     private String name;
-    private final IntObjectHashMap<Entity> entities = new IntObjectHashMap<>();
+    private final ConcurrentMap<Integer, Entity> entities = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Player> players = new ConcurrentHashMap<>();
 
     public World(@NotNull String name) {
@@ -72,7 +72,7 @@ public class World implements WorldView, Tickable {
         return Set.copyOf(players.values());
     }
 
-    public void addEntity(Entity entity) throws IllegalArgumentException {
+    public void addEntity(@NotNull Entity entity) throws IllegalArgumentException {
         if(entities.containsValue(entity)) {
             throw new IllegalArgumentException("Entity is already present in the world.");
         }

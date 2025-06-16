@@ -8,5 +8,11 @@ public abstract class GameState {
 
     public void render(float deltaTime) {}
 
+    public void pause() {}
+
+    public void resume() {}
+
+    public void resize(int width, int height) {}
+
     public void dispose() {}
 }

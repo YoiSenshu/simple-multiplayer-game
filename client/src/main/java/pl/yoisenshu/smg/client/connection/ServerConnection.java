@@ -8,6 +8,7 @@ import pl.yoisenshu.smg.network.packet.client.ServerboundPacket;
 /**
  * Represents a connection to the server or an integrated server.
  */
+@Deprecated
 public final class ServerConnection extends Connection {
 
     public ServerConnection(@NotNull Channel channel) {

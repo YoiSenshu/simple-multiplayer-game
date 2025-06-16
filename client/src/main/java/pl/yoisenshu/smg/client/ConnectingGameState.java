@@ -50,7 +50,7 @@ public class ConnectingGameState extends GameState {
         Gdx.input.setInputProcessor(stage);
 
         CompletableFuture
-            .supplyAsync(() -> client.getConnectionManager().connect(connectionData.host(), connectionData.port()))
+            .supplyAsync(() -> client.getLegacyConnectionManager().connect(connectionData.host(), connectionData.port()))
             .thenCompose(future -> future)
             .thenAccept(connection -> {
                 connectAttempted = true;
