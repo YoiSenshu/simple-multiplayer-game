@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.server.entity.Bomb;
 import pl.yoisenshu.smg.network.packet.client.ClientPlaceBombPacket;
-import pl.yoisenshu.smg.network.packet.server.ServerBombPlacedPacket;
 import pl.yoisenshu.smg.server.entity.Player;
 
 @AllArgsConstructor
@@ -16,7 +15,7 @@ class PlayerBombPlaceHandler extends SimpleChannelInboundHandler<ClientPlaceBomb
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull ClientPlaceBombPacket packet) {
-        Player player = server.players.get(ctx.channel());
+        Player player = server.getPlayerByChannel(ctx.channel());
         if(player == null) {
             return;
         }
@@ -26,16 +25,13 @@ class PlayerBombPlaceHandler extends SimpleChannelInboundHandler<ClientPlaceBomb
         }
 
         player.setBombPlaceCooldown(20);
-        int bombId = server.getNewEntityId();
 
-        var bomb = new Bomb(
-            bombId,
+        var bomb = new Bomb (
+            player.getWorld(),
             packet.getPosition(),
             60,
             server
         );
-        server.entities.put(bombId, bomb);
-
-        server.players.forEach((c, p) -> p.sendPacket(new ServerBombPlacedPacket(bombId, bomb.getPosition(), bomb.getFuseTime() * 50)));
+        player.getWorld().addEntity(bomb);
     }
 }

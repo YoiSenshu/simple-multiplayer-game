@@ -11,7 +11,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import pl.yoisenshu.smg.server.entity.BaseEntity;
+import org.jetbrains.annotations.Nullable;
 import pl.yoisenshu.smg.network.packet.PacketDecoder;
 import pl.yoisenshu.smg.network.packet.PacketEncoder;
 import pl.yoisenshu.smg.network.connection.ClientConnection;
@@ -21,16 +21,18 @@ import pl.yoisenshu.smg.network.packet.server.ServerLoginSuccessPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerJoinedPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerWorldDataPacket;
 import pl.yoisenshu.smg.network.packet.util.ExceptionHandler;
+import pl.yoisenshu.smg.server.entity.Entity;
 import pl.yoisenshu.smg.server.entity.Player;
+import pl.yoisenshu.smg.server.world.World;
 import pl.yoisenshu.smg.world.Position;
 
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class SimpleMultiplayerGameServer {
 
@@ -39,20 +41,33 @@ public class SimpleMultiplayerGameServer {
     private ServerBootstrap serverBootstrap;
     private Channel channel;
 
-    private final String worldName = "World " + Instant.now().getNano();
-    @Getter private int tick = 0;
-    @Getter final Map<Integer, BaseEntity> entities = new ConcurrentHashMap<>();
-    @Getter final Map<Channel, Player> players = new ConcurrentHashMap<>();
+    @Getter
+    private long tick = 0;
+    private final ConcurrentHashMap<Channel, Player> players = new ConcurrentHashMap<>();
+    @Getter
+    private World world;
 
-    public SimpleMultiplayerGameServer() throws InterruptedException {}
+    public SimpleMultiplayerGameServer() {}
 
     public void start() throws InterruptedException {
+
+        world = new World(
+            "World_" + Instant.now().toEpochMilli() % 1000
+        );
 
         var tickTask = new Timer();
         tickTask.schedule(new TimerTask() {
             @Override
             public void run() {
-                onTick();
+                for (@NotNull Player player : players.values()) {
+                    if(!player.isOnline() || player.isRemoved()) {
+                        if(!player.isRemoved()) {
+                            player.remove();
+                        }
+                        players.remove(player.getConnection().getChannel());
+                    }
+                }
+                world.tick(tick);
             }
         }, 5000, 40); // ~ 13 milisekund opóźnienia było przy 50ms
 
@@ -78,23 +93,21 @@ public class SimpleMultiplayerGameServer {
                                 ctx.close();
                                 return;
                             }
+
                             var player = new Player(
-                                getNewEntityId(),
+                                world,
                                 new Position(100, 100),
                                 new ClientConnection(ctx.channel()),
                                 packet.getUsername(),
                                 packet.getSkinColor()
                             );
-                            entities.put(player.getId(), player);
                             players.put(ctx.channel(), player);
 
                             player.sendPacket(new ServerLoginSuccessPacket(player.getId(), player.getPosition()));
 
-                            System.out.println("[Server] Player " + player.getUsername() + " logged in with entity ID: " + player.getId());
+                            world.addPlayer(player);
 
-                            System.out.println("[Server] Sending world data to " + player.getUsername() + " with entity ID: " + player.getId());
-                            player.sendPacket(createWorldDataPacket());
-                            System.out.println("[Server] World data sent to " + player.getUsername() + " with entity ID: " + player.getId());
+                            System.out.println("[Server] Player " + player.getUsername() + " logged in with entity ID: " + player.getId());
 
                             broadcastMessage("Player " + player.getUsername() + " has joined the game!");
 
@@ -131,9 +144,9 @@ public class SimpleMultiplayerGameServer {
 
     private void onTick() {
         tick++;
-        for (BaseEntity entity : entities.values()) {
+        for (Entity entity : world.getEntities()) {
             if(entity.isRemoved()) {
-                entities.remove(entity.getId());
+                entity.remove();
                 players.forEach((c, p) -> p.sendPacket(new ServerEntityRemovedPacket(entity.getId())));
                 continue;
             }
@@ -141,14 +154,7 @@ public class SimpleMultiplayerGameServer {
         }
     }
 
-    public int getNewEntityId() {
-        return entities.keySet().stream()
-            .mapToInt(Integer::intValue)
-            .max()
-            .orElse(0) + 1;
-    }
-
-    private ServerWorldDataPacket createWorldDataPacket() {
+    public ServerWorldDataPacket createWorldDataPacket() {
         Set<ServerWorldDataPacket.PlayerData> playerData = new HashSet<>();
         for (Player handle : players.values()) {
             playerData.add(new ServerWorldDataPacket.PlayerData(
@@ -158,7 +164,7 @@ public class SimpleMultiplayerGameServer {
                 handle.getSkinColor()
             ));
         }
-        return new ServerWorldDataPacket(worldName, playerData);
+        return new ServerWorldDataPacket(world.getName(), playerData);
     }
 
     public void shutdown() {
@@ -169,5 +175,15 @@ public class SimpleMultiplayerGameServer {
     public void broadcastMessage(@NotNull String message) {
         System.out.println("[Server] [Broadcast] " + message);
         players.forEach((c, p) -> p.sendPacket(new ServerChatMessagePacket(message)));
+    }
+
+    @Nullable
+    public Player getPlayerByChannel(@NotNull Channel channel) {
+        return players.get(channel);
+    }
+
+    @NotNull
+    public Set<Player> getOnlinePlayers() {
+        return players.values().stream().filter(Player::isOnline).collect(Collectors.toUnmodifiableSet());
     }
 }

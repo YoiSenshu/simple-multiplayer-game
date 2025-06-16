@@ -19,4 +19,8 @@ public class ClientConnection extends Connection {
         System.out.println("[Server] Closing client connection to server.");
         super.close();
     }
+
+    public Channel getChannel() {
+        return channel;
+    }
 }

@@ -5,7 +5,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.client.ClientMovePacket;
-import pl.yoisenshu.smg.network.packet.server.ServerPlayerMovePacket;
 import pl.yoisenshu.smg.server.entity.Player;
 
 @AllArgsConstructor
@@ -15,15 +14,10 @@ class PlayerMoveHandler extends SimpleChannelInboundHandler<ClientMovePacket> {
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull ClientMovePacket packet) {
-        Player player = server.players.get(ctx.channel());
+        Player player = server.getPlayerByChannel(ctx.channel());
         if(player == null) {
             return;
         }
         player.updatePosition(packet.getPosition());
-        server.players.forEach((c, p) -> {
-            if(p.getId() != player.getId()) {
-                p.sendPacket(new ServerPlayerMovePacket(player.getId(), player.getPosition()));
-            }
-        });
     }
 }

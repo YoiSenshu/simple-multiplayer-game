@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.client.entity.ClientEntity;
 import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
+import pl.yoisenshu.smg.world.WorldView;
 
 public class ClientPlayer extends ClientEntity implements PlayerView {
 
@@ -12,11 +13,12 @@ public class ClientPlayer extends ClientEntity implements PlayerView {
 
     public ClientPlayer(
         int entityId,
-        @NotNull String username,
+        @NotNull WorldView world,
         @NotNull Position position,
+        @NotNull String username,
         @NotNull SkinColor skinColor
     ) {
-        super(entityId, position);
+        super(entityId, world, position);
         this.username = username;
         this.skinColor = skinColor;
     }

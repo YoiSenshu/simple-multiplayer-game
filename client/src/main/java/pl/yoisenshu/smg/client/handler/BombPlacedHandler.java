@@ -19,8 +19,9 @@ public class BombPlacedHandler extends SimpleChannelInboundHandler<ServerBombPla
         if(world != null) {
             world.addEntity(new ClientBomb(
                 packet.getEntityId(),
+                world,
                 packet.getPosition(),
-                packet.getMillisToExplode()
+                packet.getFuseTime()
             ));
         }
     }

@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Range;
 import pl.yoisenshu.smg.entity.BombView;
 import pl.yoisenshu.smg.network.packet.server.ServerBombExplodedPacket;
 import pl.yoisenshu.smg.server.SimpleMultiplayerGameServer;
+import pl.yoisenshu.smg.server.world.World;
 import pl.yoisenshu.smg.world.Position;
 
 public class Bomb extends BaseEntity implements BombView {
@@ -18,18 +19,18 @@ public class Bomb extends BaseEntity implements BombView {
     private boolean exploded;
 
     public Bomb(
-        int id,
+        @NotNull World world,
         @NotNull Position position,
         @Range(from = 0, to = Integer.MAX_VALUE) int fuseTime,
         @NotNull SimpleMultiplayerGameServer server
     ) {
-        super(id, position);
+        super(world, position);
         this.fuseTime = fuseTime;
         this.server = server;
     }
 
     @Override
-    public void tick() {
+    public void tick(long tick) {
         if(!exploded) {
             fuseTime--;
             if(fuseTime <= 0) {
@@ -40,7 +41,10 @@ public class Bomb extends BaseEntity implements BombView {
 
     private void explode() {
         exploded = true;
-        for (Player player : server.getPlayers().values()) {
+
+        var packet = new ServerBombExplodedPacket(entityId);
+
+        for (Player player : server.getWorld().getPlayers()) {
             player.sendPacket(new ServerBombExplodedPacket(entityId));
             Position playerPosition = player.getPosition();
             float distance = position.distanceTo(playerPosition);
@@ -55,6 +59,7 @@ public class Bomb extends BaseEntity implements BombView {
                 );
 
                 player.move(newPosition);
+                player.sendPacket(packet);
             }
         }
         this.remove();

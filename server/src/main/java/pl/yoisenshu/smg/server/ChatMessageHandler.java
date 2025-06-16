@@ -15,11 +15,11 @@ class ChatMessageHandler extends SimpleChannelInboundHandler<ClientChatMessagePa
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull ClientChatMessagePacket packet) {
-        Player player = server.players.get(ctx.channel());
+        Player player = server.getPlayerByChannel(ctx.channel());
         if(player == null) {
             return;
         }
         System.out.println("[" + player.getUsername() + "] > " + packet.getMessage());
-        server.players.forEach((c, p) -> p.sendPacket(new ServerChatMessagePacket(player.getId(), player.getUsername() + " > " + packet.getMessage())));
+        server.getOnlinePlayers().forEach(p -> p.sendPacket(new ServerChatMessagePacket(player.getId(), player.getUsername() + " > " + packet.getMessage())));
     }
 }

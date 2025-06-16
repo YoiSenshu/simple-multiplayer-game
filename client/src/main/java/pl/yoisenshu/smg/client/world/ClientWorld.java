@@ -2,12 +2,14 @@ package pl.yoisenshu.smg.client.world;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import pl.yoisenshu.smg.client.SimpleMultiplayerGameClient;
 import pl.yoisenshu.smg.client.connection.ServerConnection;
 import pl.yoisenshu.smg.client.entity.ClientEntity;
 import pl.yoisenshu.smg.client.player.ControllablePlayer;
 import pl.yoisenshu.smg.client.player.ClientPlayerData;
 import pl.yoisenshu.smg.client.player.ClientPlayer;
+import pl.yoisenshu.smg.entity.EntityView;
 import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
 import pl.yoisenshu.smg.world.WorldView;
@@ -16,42 +18,39 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ClientWorld implements WorldView {
 
     private final ServerConnection connection;
     private final String worldName;
-    @Getter private final ControllablePlayer clientPlayer;
-    @Getter private final Map<Integer, ClientEntity> entities = new HashMap<>();
-    @Getter private final Map<Integer, ClientPlayer> players = new HashMap<>();
+    @Getter private final ControllablePlayer controllablePlayer;
+    private final Map<Integer, ClientEntity> entities = new HashMap<>();
+    private final Map<Integer, ClientPlayer> players = new HashMap<>();
     @Getter List<String> chatHistory = new ArrayList<>();
 
     public ClientWorld(
         @NotNull SimpleMultiplayerGameClient client,
         @NotNull ServerConnection connection,
-        @NotNull RemoteWorldData initialWorldData,
+        @NotNull WorldData worldData,
         @NotNull ClientPlayerData playerData
     ) {
         this.connection = connection;
-        this.worldName = initialWorldData.worldName();
-        this.clientPlayer = new ControllablePlayer(
-            client,
-            connection,
-            playerData
-        );
-        players.put(clientPlayer.getId(), clientPlayer);
+        this.worldName = worldData.worldName();
+        this.controllablePlayer = new ControllablePlayer(client, this, connection, playerData);
+        players.put(controllablePlayer.getId(), controllablePlayer);
+        addEntity(controllablePlayer);
 
-        for (var player : initialWorldData.players()) {
-            if(player.entityId() == clientPlayer.getId()) {
-                players.put(player.entityId(), clientPlayer);
+        for (var player : worldData.players()) {
+            if(player.entityId() == controllablePlayer.getId()) {
                 continue;
             }
-            players.put(player.entityId(), new ClientPlayer(
+            addPlayer(
                 player.entityId(),
                 player.username(),
                 player.position(),
                 player.skinColor()
-            ));
+            );
         }
     }
 
@@ -74,11 +73,12 @@ public class ClientWorld implements WorldView {
     ) {
         ClientPlayer clientPlayer = new ClientPlayer(
             entityId,
-            username,
+            this,
             position,
+            username,
             skinColor
         );
-        entities.put(entityId, clientPlayer);
+        addEntity(clientPlayer);
         players.put(entityId, clientPlayer);
     }
 
@@ -92,11 +92,31 @@ public class ClientWorld implements WorldView {
     }
 
     public void removeEntity(int entityId) {
-        entities.remove(entityId);
+        var entity = entities.remove(entityId);
+        if(entity instanceof PlayerView player && controllablePlayer != player) {
+            players.remove(player.getId());
+        }
     }
 
     @Override
     public @NotNull String getName() {
         return worldName;
+    }
+
+    @Override
+    public @NotNull Set<ClientEntity> getEntities() {
+        return Set.copyOf(entities.values());
+    }
+
+    @Nullable
+    @Override
+    public EntityView getEntityById(int entityId) {
+        return entities.get(entityId);
+    }
+
+    @NotNull
+    @Override
+    public Set<ClientPlayer> getPlayers() {
+        return Set.copyOf(players.values());
     }
 }

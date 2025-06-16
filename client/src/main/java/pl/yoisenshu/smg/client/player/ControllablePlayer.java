@@ -10,6 +10,7 @@ import pl.yoisenshu.smg.network.packet.client.ClientMovePacket;
 import pl.yoisenshu.smg.network.packet.client.ClientPlaceBombPacket;
 import pl.yoisenshu.smg.network.packet.client.ServerboundPacket;
 import pl.yoisenshu.smg.world.Position;
+import pl.yoisenshu.smg.world.WorldView;
 
 public class ControllablePlayer extends ClientPlayer {
 
@@ -18,13 +19,15 @@ public class ControllablePlayer extends ClientPlayer {
 
     public ControllablePlayer(
         @NotNull SimpleMultiplayerGameClient client,
+        @NotNull WorldView world,
         @NotNull ServerConnection connection,
         @NotNull ClientPlayerData playerData
     ) {
         super(
             playerData.playerEntityId(),
-            playerData.username(),
+            world,
             playerData.playerPosition(),
+            playerData.username(),
             playerData.skinColor()
         );
         this.client = client;

@@ -17,7 +17,7 @@ public class BombExplodedHandler extends SimpleChannelInboundHandler<ServerBombE
     protected void channelRead0(ChannelHandlerContext ctx, ServerBombExplodedPacket packet) {
         ClientWorld world = client.getCurrentWorld();
         if(world != null) {
-            var entity = world.getEntities().get(packet.getEntityId());
+            var entity = world.getEntityById(packet.getEntityId());
             if(entity instanceof ClientBomb remoteBomb) {
                 remoteBomb.showExplosion();
             }

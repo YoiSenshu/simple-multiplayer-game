@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.client.player.ControllablePlayer;
 import pl.yoisenshu.smg.client.player.ClientPlayerData;
 import pl.yoisenshu.smg.client.world.ClientWorld;
-import pl.yoisenshu.smg.client.world.RemoteWorldData;
+import pl.yoisenshu.smg.client.world.WorldData;
 import pl.yoisenshu.smg.client.world.WorldRenderer;
 import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
@@ -45,14 +45,14 @@ class PlayingGameState extends GameState {
     private boolean paused = false;
     private boolean chatting = false;
 
-    private final RemoteWorldData initialWorldData;
+    private final WorldData initialWorldData;
     private final ClientPlayerData initialPlayerData;
 
     @Getter private ClientWorld remoteWorld;
 
     PlayingGameState(
         @NotNull SimpleMultiplayerGameClient client,
-        @NotNull RemoteWorldData worldData,
+        @NotNull WorldData worldData,
         @NotNull ClientPlayerData playerData
         ) {
         this.client = client;
@@ -137,7 +137,7 @@ class PlayingGameState extends GameState {
         disconnectButton.setPosition(0, pauseGroup.getHeight() - pauseLabel.getHeight() - resumeButton.getHeight() - disconnectButton.getHeight() - 20);
         disconnectButton.addListener(event -> {
             if(disconnectButton.isPressed() && paused) {
-                remoteWorld.getClientPlayer().disconnect("Disconnect button pressed.");
+                remoteWorld.getControllablePlayer().disconnect("Disconnect button pressed.");
                 return true;
             }
             return false;
@@ -169,7 +169,7 @@ class PlayingGameState extends GameState {
             if(c == '\n' || c == '\r') {
                 String message = textField.getText().trim();
                 if(!message.isEmpty()) {
-                    remoteWorld.getClientPlayer().sendMessage(message);
+                    remoteWorld.getControllablePlayer().sendMessage(message);
                     textField.setText("");
                 }
             }
@@ -211,7 +211,7 @@ class PlayingGameState extends GameState {
 
         chatHistoryLabel.setText(String.join("\n", remoteWorld.getChatHistory()));
 
-        ControllablePlayer player = remoteWorld.getClientPlayer();
+        ControllablePlayer player = remoteWorld.getControllablePlayer();
         Position position = player.getPosition();
 
         // movement

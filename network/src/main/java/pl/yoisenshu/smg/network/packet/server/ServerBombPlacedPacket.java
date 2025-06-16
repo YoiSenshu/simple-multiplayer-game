@@ -15,14 +15,14 @@ public class ServerBombPlacedPacket implements ClientboundPacket {
 
     private int entityId;
     private Position position;
-    private int millisToExplode;
+    private int fuseTime;
 
     @Override
     public void encode(@NotNull ByteBuf out) {
         out.writeInt(entityId);
         out.writeInt(position.x());
         out.writeInt(position.y());
-        out.writeInt(millisToExplode);
+        out.writeInt(fuseTime);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ServerBombPlacedPacket implements ClientboundPacket {
         int x = in.readInt();
         int y = in.readInt();
         this.position = new Position(x, y);
-        this.millisToExplode = in.readInt();
+        this.fuseTime = in.readInt();
     }
 
     @Override

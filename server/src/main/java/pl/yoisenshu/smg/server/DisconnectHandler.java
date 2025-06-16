@@ -5,8 +5,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.client.ClientDisconnectPacket;
-import pl.yoisenshu.smg.network.packet.server.ServerPlayerLeftPacket;
-import pl.yoisenshu.smg.player.PlayerView;
+import pl.yoisenshu.smg.server.entity.Player;
 
 @AllArgsConstructor
 class DisconnectHandler extends SimpleChannelInboundHandler<ClientDisconnectPacket> {
@@ -14,17 +13,10 @@ class DisconnectHandler extends SimpleChannelInboundHandler<ClientDisconnectPack
     private final SimpleMultiplayerGameServer server;
 
     @Override
-    protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull ClientDisconnectPacket msg) {
-        var channel = ctx.channel();
-        if(!server.players.containsKey(channel)) {
-            return;
+    protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull ClientDisconnectPacket packet) {
+        Player player = server.getPlayerByChannel(ctx.channel());
+        if(player != null) {
+            player.disconnect(packet.getReason());
         }
-        PlayerView player = server.players.get(channel);
-        server.players.remove(channel);
-        server.entities.remove(player.getId());
-        server.players.forEach((c, p) -> p.sendPacket(new ServerPlayerLeftPacket(player.getId())));
-
-        System.out.println("[Server] Player " + player.getUsername() + " has disconnected. Reason:" + msg.getReason());
-        server.broadcastMessage(player.getUsername() + " has disconnected.");
     }
 }

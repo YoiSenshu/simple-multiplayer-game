@@ -6,7 +6,7 @@ import pl.yoisenshu.smg.world.Position;
 
 import java.util.Set;
 
-public record RemoteWorldData (
+public record WorldData(
     @NotNull String worldName,
     @NotNull Set<ServerWorldDataPacket.PlayerData> players,
     int playerEntityId,

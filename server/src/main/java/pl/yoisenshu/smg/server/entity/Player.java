@@ -10,10 +10,12 @@ import pl.yoisenshu.smg.network.packet.server.ServerChatMessagePacket;
 import pl.yoisenshu.smg.network.packet.server.ServerDisconnectPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerPlayerMovePacket;
 import pl.yoisenshu.smg.player.PlayerView;
+import pl.yoisenshu.smg.server.world.World;
 import pl.yoisenshu.smg.world.Position;
 
 public class Player extends BaseEntity implements PlayerView {
 
+    @Getter
     private final ClientConnection connection;
     private final String username;
     private final SkinColor skinColor;
@@ -23,13 +25,13 @@ public class Player extends BaseEntity implements PlayerView {
     private int bombPlaceCooldown = 0;
 
     public Player(
-        int entityId,
+        @NotNull World world,
         @NotNull Position position,
         @NotNull ClientConnection connection,
         @NotNull String username,
         @NotNull SkinColor skinColor
     ) {
-        super(entityId, position);
+        super(world, position);
         this.connection = connection;
         this.username = username;
         this.skinColor = skinColor;
@@ -37,6 +39,19 @@ public class Player extends BaseEntity implements PlayerView {
 
     public void sendPacket(@NotNull ClientboundPacket packet) {
         connection.sendPacket(packet);
+    }
+
+    @Override
+    public void remove() {
+        if(connection.isActive()) {
+            connection.close();
+        }
+        super.remove();
+    }
+
+    @Override
+    public void tick(long tick) {
+        bombPlaceCooldown--;
     }
 
     @Override
@@ -49,13 +64,21 @@ public class Player extends BaseEntity implements PlayerView {
         return skinColor;
     }
 
+    @Override
+    public void move(@NotNull Position newPosition) {
+        updatePosition(newPosition);
+        sendPacket(new ServerPlayerMovePacket(getId(), newPosition));
+    }
+
     public boolean isOnline() {
         return connection.isActive();
     }
 
     public void disconnect(@Nullable String reason) {
         sendPacket(new ServerDisconnectPacket(reason));
+        System.out.println("[Server] Player " + username + " disconnected: " + reason);
         connection.close();
+        remove();
     }
 
     public void sendServerMessage(@NotNull String message) {
@@ -66,19 +89,11 @@ public class Player extends BaseEntity implements PlayerView {
         sendPacket(new ServerChatMessagePacket(sender.getId(), message));
     }
 
-    @Override
-    public void move(@NotNull Position newPosition) {
-        super.move(newPosition);
-        sendPacket(new ServerPlayerMovePacket(getId(), newPosition));
-    }
-
-    @Override
-    public void tick() {
-        bombPlaceCooldown--;
-    }
-
     public void updatePosition(@NotNull Position newPosition) {
         super.move(newPosition);
+        for (Player player : getWorld().getPlayers()) {
+            player.sendPacket(new ServerPlayerMovePacket(entityId, position));
+        }
     }
 
     public boolean canPlaceBomb() {

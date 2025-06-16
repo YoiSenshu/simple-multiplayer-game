@@ -39,9 +39,9 @@ public class WorldRenderer {
     public void draw(@NotNull SpriteBatch spriteBatch, ClientWorld world, float deltaTime) {
         spriteBatch.draw(grassTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        ControllablePlayer player = world.getClientPlayer();
+        ControllablePlayer player = world.getControllablePlayer();
 
-        for (ClientPlayer clientPlayer : world.getPlayers().values()) {
+        for (ClientPlayer clientPlayer : world.getPlayers()) {
             if(clientPlayer.getId() == player.getId()) {
                 continue;
             }
@@ -52,10 +52,10 @@ public class WorldRenderer {
 
         font.setColor(Color.BLACK);
 
-        for (ClientPlayer clientPlayer : world.getPlayers().values()) {
+        for (ClientPlayer clientPlayer : world.getPlayers()) {
             font.draw(
                 spriteBatch,
-                clientPlayer.getUsername(),
+                clientPlayer.getUsername() + "[" + clientPlayer.getId() + "]",
                 clientPlayer.getPosition().x(),
                 clientPlayer.getPosition().y() + 70,
                 50,
@@ -66,7 +66,7 @@ public class WorldRenderer {
 
         font.setColor(Color.RED);
 
-        for (ClientEntity entity : world.getEntities().values()) {
+        for (ClientEntity entity : world.getEntities()) {
             if(entity instanceof ClientBomb bomb) {
                 spriteBatch.draw(bombTexture, bomb.getPosition().x(), bomb.getPosition().y(), 30, 30);
 
@@ -76,7 +76,7 @@ public class WorldRenderer {
 
                 font.draw(
                     spriteBatch,
-                    String.format("%.2fs", timeLeft),
+                    String.format("%.2fs [%d]", timeLeft, bomb.getId()),
                     bomb.getPosition().x(),
                     bomb.getPosition().y() + 40,
                     30,

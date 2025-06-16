@@ -11,7 +11,7 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.client.connection.ServerConnection;
 import pl.yoisenshu.smg.client.player.ClientPlayerData;
-import pl.yoisenshu.smg.client.world.RemoteWorldData;
+import pl.yoisenshu.smg.client.world.WorldData;
 import pl.yoisenshu.smg.network.packet.client.ClientLoginPacket;
 import pl.yoisenshu.smg.network.packet.server.ServerWorldDataPacket;
 import pl.yoisenshu.smg.world.Position;
@@ -124,7 +124,7 @@ public class ConnectingGameState extends GameState {
     }
 
     public void notifyWorldDownloaded(String worldName, Set<ServerWorldDataPacket.PlayerData> players) {
-        var worldData = new RemoteWorldData(worldName, players, playerEntityId, playerPosition);
+        var worldData = new WorldData(worldName, players, playerEntityId, playerPosition);
         System.out.println("World downloaded: " + worldName + ", players: " + players.size());
         client.changeGameState(new PlayingGameState(client, worldData, new ClientPlayerData(connectionData.username(), connectionData.skinColor(), playerEntityId, playerPosition)));
     }
