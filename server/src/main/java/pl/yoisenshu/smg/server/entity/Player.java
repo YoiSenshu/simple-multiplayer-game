@@ -99,6 +99,9 @@ public class Player extends BaseEntity implements PlayerView {
     public void updatePosition(@NotNull Position newPosition) {
         super.move(newPosition);
         for (Player player : getWorld().getPlayers()) {
+            if(player == this) {
+                continue;
+            }
             player.sendPacket(new ServerPlayerMovePacket(entityId, position));
         }
     }
