@@ -13,9 +13,9 @@ public class ClientBomb extends ClientEntity {
     private final Instant explosionTime;
     private boolean exploding = false;
 
-    public ClientBomb(int id, @NotNull WorldView world, @NotNull Position position, int countdownMillis) {
+    public ClientBomb(int id, @NotNull WorldView world, @NotNull Position position, int explosionTime) {
         super(id, world, position);
-        this.explosionTime = Instant.now().plusMillis(countdownMillis);
+        this.explosionTime = Instant.now().plusSeconds(explosionTime / 20);
     }
 
     boolean isExploded() {
