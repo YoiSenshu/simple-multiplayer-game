@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.ScreenUtils;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,8 @@ import pl.yoisenshu.smg.network.packet.util.ExceptionHandler;
 import pl.yoisenshu.smg.client.connection.ServerConnection;
 import pl.yoisenshu.smg.client.connection.LegacyConnectionManager;
 
+import static pl.yoisenshu.smg.network.packet.Packet.MAX_PACKET_LENGTH;
+
 public class SimpleMultiplayerGameClient extends ApplicationAdapter {
 
     // game states
@@ -41,6 +44,7 @@ public class SimpleMultiplayerGameClient extends ApplicationAdapter {
 
         legacyConnectionManager = new LegacyConnectionManager(channel -> {
             var pip = channel.pipeline();
+            pip.addLast(new LengthFieldBasedFrameDecoder(MAX_PACKET_LENGTH, 1, 4));
             pip.addLast(new PacketDecoder(PacketDecoder.PacketBound.CLIENTBOUND));
             pip.addLast(new PacketEncoder());
             pip.addLast(new LoginSuccessHandler(this));

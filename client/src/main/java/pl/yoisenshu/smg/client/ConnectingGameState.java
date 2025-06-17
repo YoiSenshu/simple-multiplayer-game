@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.client.connection.ServerConnection;
 import pl.yoisenshu.smg.client.player.ClientPlayerData;
@@ -19,6 +20,7 @@ import pl.yoisenshu.smg.world.Position;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 public class ConnectingGameState extends GameState {
 
     private final SimpleMultiplayerGameClient client;
@@ -120,12 +122,12 @@ public class ConnectingGameState extends GameState {
         this.playerPosition = position;
         connectionProgressLabel.setText("Downloading world data...");
 
-        System.out.println("Logged in with entity ID: " + playerEntityId + " at position: " + position);
+        log.debug("Logged in with entity ID: {} at position: {}", playerEntityId, position);
     }
 
     public void notifyWorldDownloaded(String worldName, Set<ServerWorldDataPacket.PlayerData> players) {
         var worldData = new WorldData(worldName, players, playerEntityId, playerPosition);
-        System.out.println("World downloaded: " + worldName + ", players: " + players.size());
+        log.debug("World downloaded: {}, players: {}", worldName, players.size());
         client.changeGameState(new PlayingGameState(client, worldData, new ClientPlayerData(connectionData.username(), connectionData.skinColor(), playerEntityId, playerPosition)));
     }
 }

@@ -16,6 +16,9 @@ public final class PacketUtil {
     @NotNull
     public static String readString(@NotNull ByteBuf in) {
         int length = in.readInt();
+        if (length < 0) {
+            throw new IllegalArgumentException("String length cannot be negative: " + length);
+        }
         byte[] bytes = new byte[length];
         in.readBytes(bytes);
         return new String(bytes, StandardCharsets.UTF_8);

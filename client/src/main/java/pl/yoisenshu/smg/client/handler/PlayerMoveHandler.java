@@ -13,10 +13,10 @@ public class PlayerMoveHandler extends SimpleChannelInboundHandler<ServerPlayerM
     private final SimpleMultiplayerGameClient client;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ServerPlayerMovePacket msg) {
+    protected void channelRead0(ChannelHandlerContext ctx, ServerPlayerMovePacket packet) {
         ClientWorld world = client.getCurrentWorld();
         if(world != null) {
-            world.updatePlayerPosition(msg.getEntityId(), msg.getPosition());
+            world.updatePlayerPosition(packet.getEntityId(), packet.getPosition());
         }
     }
 }

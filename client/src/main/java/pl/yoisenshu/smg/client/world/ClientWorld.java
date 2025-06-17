@@ -14,11 +14,14 @@ import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
 import pl.yoisenshu.smg.world.WorldView;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ClientWorld implements WorldView {
 
@@ -27,7 +30,8 @@ public class ClientWorld implements WorldView {
     @Getter private final ControllablePlayer controllablePlayer;
     private final Map<Integer, ClientEntity> entities = new HashMap<>();
     private final Map<Integer, ClientPlayer> players = new HashMap<>();
-    @Getter List<String> chatHistory = new ArrayList<>();
+    @Getter
+    ConcurrentMap<Instant, String> chatHistory = new ConcurrentHashMap<>();
 
     public ClientWorld(
         @NotNull SimpleMultiplayerGameClient client,
@@ -62,7 +66,7 @@ public class ClientWorld implements WorldView {
     }
 
     public void addChatMessage(@NotNull String message) {
-        chatHistory.add(message);
+        chatHistory.put(Instant.now(), message);
     }
 
     public void addPlayer(

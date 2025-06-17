@@ -9,6 +9,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static pl.yoisenshu.smg.network.packet.Packet.MAX_PACKET_LENGTH;
 
 @Slf4j
 public class SimpleMultiplayerGameServer {
@@ -84,6 +87,7 @@ public class SimpleMultiplayerGameServer {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         ChannelPipeline pip = ch.pipeline();
+                        pip.addLast(new LengthFieldBasedFrameDecoder(MAX_PACKET_LENGTH, 1, 4));
                         pip.addLast(new PacketEncoder());
                         pip.addLast(new PacketDecoder(PacketDecoder.PacketBound.SERVERBOUND));
                         pip.addLast(new ExceptionHandler("Server"));

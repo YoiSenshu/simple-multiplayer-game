@@ -45,7 +45,7 @@ public class Bomb extends BaseEntity implements BombView {
         exploded = true;
         log.debug("Bomb {} exploded at position {}", entityId, position);
 
-        var packet = new ServerBombExplodedPacket(entityId);
+        var bombExplodedPacket = new ServerBombExplodedPacket(entityId);
 
         for (Player player : server.getWorld().getPlayers()) {
             player.sendPacket(new ServerBombExplodedPacket(entityId));
@@ -63,7 +63,7 @@ public class Bomb extends BaseEntity implements BombView {
 
                 log.debug("Player {} knocked back to position {}", player.getUsername(), newPosition);
                 player.move(newPosition);
-                player.sendPacket(packet);
+                player.sendPacket(bombExplodedPacket);
             }
         }
         this.remove();

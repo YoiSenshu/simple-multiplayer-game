@@ -3,7 +3,6 @@ package pl.yoisenshu.smg.network.connection;
 import io.netty.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.Packet;
-import pl.yoisenshu.smg.network.packet.client.ServerboundPacket;
 
 public abstract class Connection {
 
@@ -14,7 +13,6 @@ public abstract class Connection {
     }
 
     public void close() {
-        System.out.println("Closing connection...");
         channel.close();
     }
 

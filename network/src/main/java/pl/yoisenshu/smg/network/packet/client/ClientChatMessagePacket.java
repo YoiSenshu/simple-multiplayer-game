@@ -1,34 +1,36 @@
 package pl.yoisenshu.smg.network.packet.client;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import pl.yoisenshu.smg.network.packet.PacketType;
-
-import java.nio.charset.StandardCharsets;
+import pl.yoisenshu.smg.network.packet.util.PacketUtil;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ClientChatMessagePacket implements ServerboundPacket {
 
     private String message;
 
+    public ClientChatMessagePacket(@NotNull String message) {
+        this.message = message;
+        if(message.length() > 100) {
+            this.message = message.substring(0, 100);
+        }
+    }
+
     @Override
     public void encode(@NotNull ByteBuf out) {
-        byte[] messageBytes = message.getBytes();
-        out.writeInt(messageBytes.length);
-        out.writeBytes(messageBytes);
+        PacketUtil.writeString(out, message);
     }
 
     @Override
     public void decode(@NotNull ByteBuf in) {
-        int messageLength = in.readInt();
-        byte[] reasonBytes = new byte[messageLength];
-        in.readBytes(reasonBytes);
-        this.message = new String(reasonBytes, StandardCharsets.UTF_8);
+        this.message = PacketUtil.readString(in);
+        if(message.length() > 100) {
+            message = message.substring(0, 100);
+        }
     }
 
     @Override

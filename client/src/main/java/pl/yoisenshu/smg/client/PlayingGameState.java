@@ -23,7 +23,9 @@ import pl.yoisenshu.smg.client.world.WorldRenderer;
 import pl.yoisenshu.smg.player.PlayerView;
 import pl.yoisenshu.smg.world.Position;
 
+import java.time.Instant;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 class PlayingGameState extends GameState {
 
@@ -207,9 +209,42 @@ class PlayingGameState extends GameState {
         }
 
         pauseGroup.setVisible(paused);
-        chatGroup.setVisible(chatting);
 
-        chatHistoryLabel.setText(String.join("\n", remoteWorld.getChatHistory()));
+        if(chatting) {
+            chatGroup.setVisible(true);
+            var messages = remoteWorld.getChatHistory()
+                .keySet()
+                .stream()
+                .sorted(Instant::compareTo)
+                .map(instant -> remoteWorld.getChatHistory().get(instant))
+                .collect(Collectors.joining("\n"));
+            chatHistoryLabel.setText(messages);
+            chatInput.setVisible(true);
+            stage.setKeyboardFocus(chatInput);
+        } else {
+            Instant deadline = Instant.now().minusSeconds(5);
+            Instant lastMessageTime = remoteWorld.getChatHistory()
+                .keySet()
+                .stream()
+                .max(Instant::compareTo)
+                .orElse(null);
+
+            if(lastMessageTime != null && lastMessageTime.isAfter(deadline)) {
+
+                var lastMessages = remoteWorld.getChatHistory().entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().isAfter(deadline))
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.joining("\n"));
+
+                chatHistoryLabel.setText(lastMessages);
+                chatGroup.setVisible(true);
+                chatInput.setVisible(false);
+            } else {
+                chatGroup.setVisible(false);
+            }
+        }
 
         ControllablePlayer player = remoteWorld.getControllablePlayer();
         Position position = player.getPosition();
@@ -228,7 +263,9 @@ class PlayingGameState extends GameState {
             if(Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 position = new Position(position.x() + WALK_SPEED, position.y());
             }
-            player.move(position);
+            if(position.x() != player.getPosition().x() || position.y() != player.getPosition().y()) {
+                player.move(position);
+            }
         }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.B) && !paused && !chatting) {
