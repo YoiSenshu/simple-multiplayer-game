@@ -294,4 +294,12 @@ class PlayingGameState extends GameState {
                "Paused: " + paused + "\n" +
                 "Chatting: " + chatting;
     }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        debugLabel.setPosition(10, Gdx.graphics.getHeight() - 10);
+        pauseGroup.setPosition(stage.getWidth() / 2f - pauseGroup.getWidth() / 2f,             stage.getHeight() / 2f - pauseGroup.getHeight() / 2f);
+    }
 }
